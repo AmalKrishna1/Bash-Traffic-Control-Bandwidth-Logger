@@ -6,11 +6,9 @@ LOG_FILE="/tmp/bw.log"
 #Generate the random traffic for bw.log
 gen_traffic(){
   while true; do
-    # Get the current network traffic in KB/s
-    #ifstat command is used to get the network traffic
-    # The interface 'en0' is based on system "MAC"
-    # 1 1 means to sample once every second for one time
-    TRAFFIC=$(ifstat -i en0 1 1 | awk 'NR==3 {print $1}')
+    # Simulate traffic between 100 and 1099 KB/s
+    TRAFFIC=$((RANDOM % 1000 + 100))
+    # Append traffic to log file
     echo "$TRAFFIC" >> "$LOG_FILE"
     sleep 1
   done
@@ -29,12 +27,13 @@ trap file_cleanup SIGINT SIGTERM
 gen_traffic &
 GEN_PID=$!
 
+# Human Readable traffic showing current time and simulated traffic values
 for i in {1..6}; do
-  sleep 10
-  TRAFFIC=$(tail -n 1 "$LOG_FILE")
-  TIMESTAMP=$(date "+%H:%M:%S")
-  printf "%s: current traffic = %s KB/s \n" "$TIMESTAMP" "$TRAFFIC"
+  sleep 10 # Wait for 10 seconds
+  TRAFFIC=$(tail -n 1 "$LOG_FILE") # Get the last traffic value that was written into the log file
+  TIMESTAMP=$(date +"%H:%M:%S")
+  printf "%s: current traffic = %s KB/s \n" "$TIMESTAMP" "$TRAFFIC" # Print the human-readable output
 done
 
-kill $GEN_PID
-file_cleanup
+kill $GEN_PID # Stop the background traffic generation
+file_cleanup # Clean up the log file on exit
