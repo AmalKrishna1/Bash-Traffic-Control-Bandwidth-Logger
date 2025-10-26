@@ -43,11 +43,3 @@ teardown(){
 
   kill $!
 }
-
-@test "Output to the terminal is in HH:MM:SS: current traffix = XXXX KB/s format" {
-  run bash bwlog.sh &
-  sleep 65
-  
-  #Fill In the rest
-
-}
